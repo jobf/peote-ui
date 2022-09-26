@@ -51,19 +51,26 @@ class SoftController extends Application {
 				color_off: 0x999999FF,
 				color_hover: 0xee6666FF
 			}, roundBorderStyle,
-			(pressed:Pad) -> {
-				for(pad in grid.cells){
-					if(pad != pressed){
-						pad.toggle(false);
-					}
-				}
-			});
+			onPadClicked);
 		},
 		gridWidth,
 		gridHeight);
 		
 		for(pad in grid.cells){
 			uiDisplay.add(pad.element);
+		}
+	}
+
+	function onPadClicked(pad_clicked:Pad){
+		for(pad in grid.cells){
+			if(pad == pad_clicked){
+				// if it's the pad that was clicked, toggle the on state
+				pad.toggle(!pad.isOn);
+			}
+			else{
+				// else reset to off
+				pad.toggle(false);
+			}
 		}
 	}
 
@@ -84,24 +91,23 @@ class PadConfig {
 
 class Pad {
 	public var element(default, null):UIElement;
-	var isOn:Bool;
+	public var isOn(default, null):Bool;
 	var config:PadConfig;
-	var notify_onClick:(pad:Pad)->Void;
+	var onClicked:(pad:Pad)->Void;
 
-	public function new(config:PadConfig, style:RoundBorderStyle, notify_onClick:(pad:Pad)->Void) {
+	public function new(config:PadConfig, style:RoundBorderStyle, onClicked:(pad:Pad)->Void) {
 		this.config = config;
-		this.notify_onClick = notify_onClick;
+		this.onClicked = onClicked;
 		element = new UIElement(
 			config.pixel_x,
 			config.pixel_y,
-			config.pixel_w, 
+			config.pixel_w,
 			config.pixel_h,
 			style);
 
 			element.onPointerOver = onOver;
 			element.onPointerOut = onOut;
 			element.onPointerClick = onClick;
-			element.upDownEventsBubbleToDisplay = true;
 		}
 
 	inline function onOver(uiElement:UIElement, e:PointerEvent) {
@@ -117,8 +123,7 @@ class Pad {
 	}
 
 	inline function onClick(uiElement:UIElement, e:PointerEvent) {
-		toggle(!isOn);
-		notify_onClick(this);
+		onClicked(this);
 	}
 
 	public inline function toggle(isOn:Bool){
