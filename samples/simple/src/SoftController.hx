@@ -60,18 +60,13 @@ class SoftController extends Application {
 			uiDisplay.add(pad.element);
 		}
 	}
-
+	var lastPressed:Pad = null;
 	function onPadClicked(pad_clicked:Pad){
-		for(pad in grid.cells){
-			if(pad == pad_clicked){
-				// if it's the pad that was clicked, toggle the on state
-				pad.toggle(!pad.isOn);
-			}
-			else{
-				// else reset to off
-				pad.toggle(false);
-			}
+		if(lastPressed != null){
+			lastPressed.toggle(false);
 		}
+		pad_clicked.toggle(!pad_clicked.isOn);
+		lastPressed = pad_clicked;
 	}
 
 }
