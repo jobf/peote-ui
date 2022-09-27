@@ -51,7 +51,7 @@ class SoftController extends Application {
 				color_off: 0x999999FF,
 				color_hover: 0xee6666FF
 			}, roundBorderStyle,
-			onPadClicked);
+			onPadEnabled);
 		},
 		gridWidth,
 		gridHeight);
@@ -60,15 +60,15 @@ class SoftController extends Application {
 			uiDisplay.add(pad.element);
 		}
 	}
-	var lastPressed:Pad = null;
-	function onPadClicked(pad_clicked:Pad){
-		if(lastPressed != null){
-			lastPressed.toggle(false);
-		}
-		pad_clicked.toggle(!pad_clicked.isOn);
-		lastPressed = pad_clicked;
-	}
 
+	var lastEnabled:Pad = null;
+	function onPadEnabled(pad_enabled:Pad){
+		if(lastEnabled != null){
+			lastEnabled.toggle(false);
+		}
+		pad_enabled.toggle(!pad_enabled.isOn);
+		lastEnabled = pad_enabled;
+	}
 }
 
 @:structInit
@@ -88,11 +88,11 @@ class Pad {
 	public var element(default, null):UIElement;
 	public var isOn(default, null):Bool;
 	var config:PadConfig;
-	var onClicked:(pad:Pad)->Void;
+	var onEnabled:(pad:Pad)->Void;
 
-	public function new(config:PadConfig, style:RoundBorderStyle, onClicked:(pad:Pad)->Void) {
+	public function new(config:PadConfig, style:RoundBorderStyle, onEnabled:(pad:Pad)->Void) {
 		this.config = config;
-		this.onClicked = onClicked;
+		this.onEnabled = onEnabled;
 		element = new UIElement(
 			config.pixel_x,
 			config.pixel_y,
@@ -102,7 +102,7 @@ class Pad {
 
 			element.onPointerOver = onOver;
 			element.onPointerOut = onOut;
-			element.onPointerClick = onClick;
+			element.onPointerDown = onDown;
 		}
 
 	inline function onOver(uiElement:UIElement, e:PointerEvent) {
@@ -117,8 +117,8 @@ class Pad {
 		element.updateStyle();
 	}
 
-	inline function onClick(uiElement:UIElement, e:PointerEvent) {
-		onClicked(this);
+	inline function onDown(uiElement:UIElement, e:PointerEvent) {
+		onEnabled(this);
 	}
 
 	public inline function toggle(isOn:Bool){
